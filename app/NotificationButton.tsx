@@ -95,11 +95,49 @@ export default function NotificationButton() {
       const { publicKey } = (await vapidRes.json()) as { publicKey: string };
 
       setMessage("3/6 A esperar pelo service worker...");
-      const registration = await withTimeout(
-        navigator.serviceWorker.ready,
-        15000,
-        "service worker ready"
-      );
+      let registration: ServiceWorkerRegistration | undefined;
+      try {
+        registration = await withTimeout(
+          navigator.serviceWorker.ready,
+          5000,
+          "SW ready inicial"
+        );
+      } catch {
+        setMessage("3b/6 SW não estava pronto — a registar explicitamente...");
+        try {
+          const existingRegs = await navigator.serviceWorker.getRegistrations();
+          for (const r of existingRegs) {
+            await r.unregister().catch(() => {});
+          }
+        } catch {}
+
+        registration = await withTimeout(
+          navigator.serviceWorker.register("/sw.js", { updateViaCache: "none" }),
+          15000,
+          "registar SW"
+        );
+
+        setMessage("3c/6 A esperar que o SW fique ativo...");
+        if (!registration.active) {
+          await withTimeout(
+            new Promise<void>((resolve, reject) => {
+              const target = registration!.installing ?? registration!.waiting;
+              if (!target) {
+                if (registration!.active) return resolve();
+                return reject(new Error("Sem SW a instalar/aguardar"));
+              }
+              target.addEventListener("statechange", () => {
+                if (target.state === "activated") resolve();
+              });
+            }),
+            20000,
+            "SW activar"
+          );
+        }
+      }
+      if (!registration) {
+        throw new Error("Não consegui obter registo do service worker");
+      }
 
       setMessage("4/6 A limpar subscrição antiga...");
       const existing = await registration.pushManager.getSubscription();
