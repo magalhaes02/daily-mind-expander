@@ -1,6 +1,7 @@
 import NotificationButton from "./NotificationButton";
 import DailyBriefing from "./DailyBriefing";
 import TopicSelector from "./TopicSelector";
+import StreakBadge from "./StreakBadge";
 
 export default function Home() {
   return (
@@ -46,6 +47,8 @@ export default function Home() {
           pensamento crítico, cultura, capacidade de conversa e compreensão do
           mundo.
         </p>
+
+        <StreakBadge />
 
         <NotificationButton />
 
