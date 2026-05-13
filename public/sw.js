@@ -1,4 +1,4 @@
-const CACHE_NAME = "daily-mind-expander-v2";
+const CACHE_NAME = "daily-mind-expander-v3";
 const BRIEFING_STORAGE_KEY = "daily-mind-expander-briefing-payload";
 
 const urlsToCache = [
@@ -11,7 +11,14 @@ const urlsToCache = [
 self.addEventListener("install", (event) => {
   self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(urlsToCache))
+    (async () => {
+      try {
+        const cache = await caches.open(CACHE_NAME);
+        await Promise.allSettled(urlsToCache.map((url) => cache.add(url)));
+      } catch (err) {
+        console.warn("SW: cache populate failed (non-fatal):", err);
+      }
+    })()
   );
 });
 
