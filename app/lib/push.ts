@@ -8,7 +8,7 @@ export type PushResult = {
   error?: string;
 };
 
-const MAX_PAYLOAD_BYTES = 3000;
+const MAX_PAYLOAD_BYTES = 1800;
 
 function configureVapid() {
   const publicKey = process.env.VAPID_PUBLIC_KEY;
@@ -79,13 +79,11 @@ function buildPayload(briefing: Briefing): string {
   };
 
   const tiers: Array<{ items: number; text: number; rel: number; title: number }> = [
-    { items: 12, text: 260, rel: 140, title: 100 },
-    { items: 10, text: 220, rel: 110, title: 90 },
-    { items: 10, text: 180, rel: 90, title: 80 },
-    { items: 8, text: 160, rel: 80, title: 80 },
-    { items: 8, text: 130, rel: 70, title: 70 },
-    { items: 7, text: 110, rel: 60, title: 60 },
+    { items: 8, text: 140, rel: 70, title: 70 },
+    { items: 7, text: 120, rel: 60, title: 60 },
     { items: 6, text: 100, rel: 50, title: 60 },
+    { items: 5, text: 90, rel: 40, title: 55 },
+    { items: 4, text: 80, rel: 40, title: 50 },
   ];
 
   for (const tier of tiers) {

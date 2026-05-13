@@ -299,8 +299,37 @@ export default function DailyBriefing() {
 
   useEffect(() => {
     const stored = loadFromStorage();
+    const today = todayKeyLisbon();
+    if (stored && stored.dateKey === today) {
+      setBriefing(stored);
+      return;
+    }
     if (stored) setBriefing(stored);
+    void fetchBriefingAuto();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  async function fetchBriefingAuto() {
+    setLoading(true);
+    setError("");
+    try {
+      const preferences = loadPreferences();
+      const url = preferences.length
+        ? `/api/briefing?topics=${encodeURIComponent(preferences.join(","))}`
+        : "/api/briefing";
+      const res = await fetch(url, { cache: "no-store" });
+      if (!res.ok) return;
+      const data = (await res.json()) as Briefing;
+      if (Array.isArray(data.items) && data.items.length > 0) {
+        setBriefing(data);
+        saveToStorage(data);
+      }
+    } catch {
+      // silent — user can use the manual button
+    } finally {
+      setLoading(false);
+    }
+  }
 
   useEffect(() => {
     if (typeof navigator === "undefined" || !("serviceWorker" in navigator))
