@@ -44,6 +44,19 @@ export default function NotificationButton() {
     }
   }, []);
 
+  function withTimeout<T>(
+    promise: Promise<T>,
+    ms: number,
+    label: string
+  ): Promise<T> {
+    return Promise.race([
+      promise,
+      new Promise<T>((_, reject) =>
+        setTimeout(() => reject(new Error(`Timeout em: ${label}`)), ms)
+      ),
+    ]);
+  }
+
   async function subscribePush() {
     setBusy(true);
     setMessage("");
@@ -55,14 +68,23 @@ export default function NotificationButton() {
         return;
       }
 
-      const perm = await Notification.requestPermission();
-      setPermission(perm);
+      setMessage("1/6 A verificar permissão...");
+      let perm: NotificationPermission = Notification.permission;
+      if (perm !== "granted") {
+        perm = await withTimeout(
+          Notification.requestPermission(),
+          30000,
+          "pedir permissão"
+        );
+        setPermission(perm);
+      }
       if (perm !== "granted") {
         setMessage("Permissão de notificações não concedida.");
         return;
       }
 
-      const vapidRes = await fetch("/api/vapid");
+      setMessage("2/6 A obter chave VAPID...");
+      const vapidRes = await withTimeout(fetch("/api/vapid"), 15000, "fetch VAPID");
       if (!vapidRes.ok) {
         const errBody = await vapidRes.json().catch(() => ({}));
         setMessage(
@@ -72,37 +94,60 @@ export default function NotificationButton() {
       }
       const { publicKey } = (await vapidRes.json()) as { publicKey: string };
 
-      const registration = await navigator.serviceWorker.ready;
-      let sub = await registration.pushManager.getSubscription();
-      if (!sub) {
-        sub = await registration.pushManager.subscribe({
+      setMessage("3/6 A esperar pelo service worker...");
+      const registration = await withTimeout(
+        navigator.serviceWorker.ready,
+        15000,
+        "service worker ready"
+      );
+
+      setMessage("4/6 A limpar subscrição antiga...");
+      const existing = await registration.pushManager.getSubscription();
+      if (existing) {
+        try {
+          await withTimeout(existing.unsubscribe(), 10000, "unsubscribe antiga");
+        } catch {
+          // ignora — vamos tentar criar uma nova na mesma
+        }
+      }
+
+      setMessage("5/6 A criar nova subscrição (pode demorar)...");
+      const sub = await withTimeout(
+        registration.pushManager.subscribe({
           userVisibleOnly: true,
           applicationServerKey: urlBase64ToUint8Array(publicKey),
-        });
-      }
+        }),
+        45000,
+        "criar subscrição (iOS)"
+      );
 
       const json = JSON.stringify(sub.toJSON());
       setSubscriptionJson(json);
 
-      const saveRes = await fetch("/api/subscribe", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: json,
-      });
+      setMessage("6/6 A guardar no servidor...");
+      const saveRes = await withTimeout(
+        fetch("/api/subscribe", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: json,
+        }),
+        15000,
+        "POST subscribe"
+      );
       const saveBody = await saveRes.json().catch(() => ({}));
 
       if (saveBody.alreadyStored) {
         setMessage(
-          "Subscrição ativa e já configurada no servidor. Vais receber o briefing às 9h."
+          "✓ Subscrição ativa e já configurada no servidor. Vais receber o briefing às 9h."
         );
       } else {
         setMessage(
-          "Subscrição criada. Falta um passo manual: copia o JSON abaixo e cola na variável PUSH_SUBSCRIPTION no Vercel."
+          "✓ Subscrição criada. Falta um passo manual: copia o JSON abaixo e cola na variável PUSH_SUBSCRIPTION no Vercel."
         );
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Erro desconhecido";
-      setMessage(`Erro a subscrever: ${msg}`);
+      setMessage(`Erro: ${msg}`);
     } finally {
       setBusy(false);
     }
