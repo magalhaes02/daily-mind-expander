@@ -67,11 +67,11 @@ export default function TopicSelector() {
   return (
     <section
       style={{
-        marginTop: "48px",
+        marginTop: "32px",
         background: "rgba(15, 23, 42, 0.95)",
         border: "1px solid #334155",
-        borderRadius: "28px",
-        padding: "28px",
+        borderRadius: "22px",
+        padding: "clamp(18px, 5vw, 28px)",
       }}
     >
       <div
@@ -83,11 +83,24 @@ export default function TopicSelector() {
           flexWrap: "wrap",
         }}
       >
-        <div>
-          <h2 style={{ marginTop: 0, marginBottom: "6px" }}>
+        <div style={{ flex: "1 1 auto", minWidth: 0 }}>
+          <h2
+            style={{
+              marginTop: 0,
+              marginBottom: "4px",
+              fontSize: "clamp(18px, 5vw, 22px)",
+            }}
+          >
             Os teus temas preferidos
           </h2>
-          <p style={{ margin: 0, color: "#94a3b8", lineHeight: 1.6 }}>
+          <p
+            style={{
+              margin: 0,
+              color: "#94a3b8",
+              lineHeight: 1.55,
+              fontSize: "clamp(13px, 3.6vw, 15px)",
+            }}
+          >
             {summary}
           </p>
         </div>
@@ -95,14 +108,15 @@ export default function TopicSelector() {
         <button
           onClick={() => setExpanded((v) => !v)}
           style={{
-            padding: "10px 18px",
+            padding: "10px 16px",
             borderRadius: "999px",
             border: "1px solid #38bdf8",
             background: "transparent",
             color: "#7dd3fc",
             fontWeight: "bold",
             cursor: "pointer",
-            fontSize: "14px",
+            fontSize: "clamp(12px, 3.4vw, 14px)",
+            whiteSpace: "nowrap",
           }}
         >
           {expanded ? "Ocultar" : "Editar preferências"}

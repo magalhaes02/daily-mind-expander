@@ -123,16 +123,16 @@ export default function StreakBadge() {
   return (
     <div
       style={{
-        marginTop: "24px",
+        marginTop: "20px",
         display: "flex",
-        gap: "14px",
+        gap: "12px",
         flexWrap: "wrap",
       }}
     >
       <div
         style={{
-          padding: "18px 24px",
-          borderRadius: "22px",
+          padding: "clamp(14px, 4vw, 18px) clamp(18px, 5vw, 24px)",
+          borderRadius: "20px",
           background: isMilestone
             ? "linear-gradient(135deg, #f97316, #dc2626)"
             : "rgba(249, 115, 22, 0.13)",
@@ -141,17 +141,21 @@ export default function StreakBadge() {
             : "1px solid rgba(249, 115, 22, 0.45)",
           display: "flex",
           alignItems: "center",
-          gap: "14px",
+          gap: "12px",
+          flex: "1 1 auto",
+          minWidth: 0,
           boxShadow: isMilestone
             ? "0 0 30px rgba(249, 115, 22, 0.35)"
             : "none",
         }}
       >
-        <span style={{ fontSize: "34px", lineHeight: 1 }}>🔥</span>
-        <div>
+        <span style={{ fontSize: "clamp(26px, 7vw, 34px)", lineHeight: 1 }}>
+          🔥
+        </span>
+        <div style={{ minWidth: 0 }}>
           <div
             style={{
-              fontSize: "24px",
+              fontSize: "clamp(18px, 5vw, 24px)",
               fontWeight: "bold",
               color: isMilestone ? "#fff" : "#fde68a",
               lineHeight: 1.1,
@@ -162,7 +166,7 @@ export default function StreakBadge() {
           {milestoneMsg ? (
             <div
               style={{
-                fontSize: "13px",
+                fontSize: "clamp(11px, 3vw, 13px)",
                 color: "#fff",
                 marginTop: "4px",
                 fontWeight: "bold",
@@ -173,7 +177,7 @@ export default function StreakBadge() {
           ) : (
             <div
               style={{
-                fontSize: "12px",
+                fontSize: "clamp(11px, 3vw, 13px)",
                 color: "#fbbf24",
                 marginTop: "4px",
                 opacity: 0.8,
@@ -188,20 +192,21 @@ export default function StreakBadge() {
       {showRecord && (
         <div
           style={{
-            padding: "18px 24px",
-            borderRadius: "22px",
+            padding: "clamp(14px, 4vw, 18px) clamp(18px, 5vw, 24px)",
+            borderRadius: "20px",
             background: "rgba(56, 189, 248, 0.10)",
             border: "1px solid rgba(56, 189, 248, 0.35)",
             display: "flex",
             alignItems: "center",
-            gap: "12px",
+            gap: "10px",
+            flex: "0 1 auto",
           }}
         >
-          <span style={{ fontSize: "26px" }}>🏆</span>
+          <span style={{ fontSize: "clamp(20px, 6vw, 26px)" }}>🏆</span>
           <div>
             <div
               style={{
-                fontSize: "18px",
+                fontSize: "clamp(15px, 4vw, 18px)",
                 fontWeight: "bold",
                 color: "#7dd3fc",
                 lineHeight: 1.1,
@@ -211,7 +216,7 @@ export default function StreakBadge() {
             </div>
             <div
               style={{
-                fontSize: "12px",
+                fontSize: "clamp(11px, 3vw, 13px)",
                 color: "#94a3b8",
                 marginTop: "4px",
               }}

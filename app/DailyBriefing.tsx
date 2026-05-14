@@ -53,8 +53,9 @@ function ExpandedText({
             key={i}
             style={{
               color: "#dbeafe",
-              lineHeight: 1.75,
+              lineHeight: 1.65,
               margin: "0 0 12px 0",
+              fontSize: "clamp(14px, 3.9vw, 16px)",
             }}
           >
             {para}
@@ -160,16 +161,50 @@ function TopicCard({
       style={{
         background: "#020617",
         border: "1px solid #1e293b",
-        borderRadius: "18px",
-        padding: "22px",
+        borderRadius: "16px",
+        padding: "clamp(16px, 4.5vw, 22px)",
       }}
     >
-      <p style={{ color: "#38bdf8", fontWeight: "bold", marginTop: 0 }}>
+      <p
+        style={{
+          color: "#38bdf8",
+          fontWeight: "bold",
+          marginTop: 0,
+          fontSize: "clamp(13px, 3.6vw, 15px)",
+          marginBottom: "8px",
+        }}
+      >
         {index + 1}. {item.category}
       </p>
-      <h3 style={{ marginTop: 0, color: "#e0f2fe" }}>{item.title}</h3>
-      <p style={{ color: "#e5e7eb", lineHeight: 1.7 }}>{item.text}</p>
-      <p style={{ color: "#94a3b8", lineHeight: 1.6 }}>
+      <h3
+        style={{
+          marginTop: 0,
+          marginBottom: "10px",
+          color: "#e0f2fe",
+          fontSize: "clamp(17px, 4.8vw, 20px)",
+          lineHeight: 1.3,
+        }}
+      >
+        {item.title}
+      </h3>
+      <p
+        style={{
+          color: "#e5e7eb",
+          lineHeight: 1.6,
+          fontSize: "clamp(14px, 3.9vw, 16px)",
+          margin: "0 0 10px 0",
+        }}
+      >
+        {item.text}
+      </p>
+      <p
+        style={{
+          color: "#94a3b8",
+          lineHeight: 1.55,
+          fontSize: "clamp(13px, 3.6vw, 15px)",
+          margin: 0,
+        }}
+      >
         <strong>Porque importa:</strong> {item.relevance}
       </p>
 
@@ -177,15 +212,15 @@ function TopicCard({
         onClick={loadMore}
         disabled={streaming}
         style={{
-          marginTop: "12px",
-          padding: "10px 18px",
+          marginTop: "14px",
+          padding: "10px 16px",
           borderRadius: "999px",
           border: "1px solid #38bdf8",
           background: expanded ? "rgba(56, 189, 248, 0.18)" : "transparent",
           color: "#7dd3fc",
           fontWeight: "bold",
           cursor: streaming ? "wait" : "pointer",
-          fontSize: "14px",
+          fontSize: "clamp(12px, 3.4vw, 14px)",
         }}
       >
         {streaming
@@ -242,15 +277,30 @@ function ReflectionSection({
   return (
     <div
       style={{
-        marginTop: "28px",
-        padding: "24px",
-        borderRadius: "20px",
+        marginTop: "24px",
+        padding: "clamp(18px, 5vw, 24px)",
+        borderRadius: "18px",
         background: "linear-gradient(135deg, #0f172a, #172554)",
         border: "1px solid #1d4ed8",
       }}
     >
-      <h3 style={{ marginTop: 0 }}>Pergunta para reflexão</h3>
-      <p style={{ color: "#dbeafe", fontSize: "18px", lineHeight: 1.7 }}>
+      <h3
+        style={{
+          marginTop: 0,
+          marginBottom: "8px",
+          fontSize: "clamp(16px, 4.5vw, 19px)",
+        }}
+      >
+        Pergunta para reflexão
+      </h3>
+      <p
+        style={{
+          color: "#dbeafe",
+          fontSize: "clamp(15px, 4.1vw, 17px)",
+          lineHeight: 1.55,
+          margin: "0 0 12px 0",
+        }}
+      >
         {reflection}
       </p>
 
@@ -258,15 +308,15 @@ function ReflectionSection({
         onClick={loadExample}
         disabled={streaming}
         style={{
-          marginTop: "4px",
-          padding: "10px 18px",
+          marginTop: "2px",
+          padding: "10px 16px",
           borderRadius: "999px",
           border: "1px solid #60a5fa",
           background: example ? "rgba(96, 165, 250, 0.18)" : "transparent",
           color: "#bfdbfe",
           fontWeight: "bold",
           cursor: streaming ? "wait" : "pointer",
-          fontSize: "14px",
+          fontSize: "clamp(12px, 3.4vw, 14px)",
         }}
       >
         {streaming
@@ -277,15 +327,36 @@ function ReflectionSection({
       </button>
 
       {error && (
-        <p style={{ marginTop: "10px", color: "#fca5a5", fontSize: "14px" }}>
+        <p
+          style={{
+            marginTop: "10px",
+            color: "#fca5a5",
+            fontSize: "clamp(12px, 3.4vw, 14px)",
+          }}
+        >
           {error}
         </p>
       )}
 
       {example && <ExpandedText text={example} streaming={streaming} />}
 
-      <h3 style={{ marginTop: "24px" }}>Recomendação</h3>
-      <p style={{ color: "#dbeafe", fontSize: "18px", lineHeight: 1.7 }}>
+      <h3
+        style={{
+          marginTop: "20px",
+          marginBottom: "8px",
+          fontSize: "clamp(16px, 4.5vw, 19px)",
+        }}
+      >
+        Recomendação
+      </h3>
+      <p
+        style={{
+          color: "#dbeafe",
+          fontSize: "clamp(15px, 4.1vw, 17px)",
+          lineHeight: 1.55,
+          margin: 0,
+        }}
+      >
         {recommendation}
       </p>
     </div>
@@ -385,22 +456,44 @@ export default function DailyBriefing() {
   return (
     <section
       style={{
-        marginTop: "48px",
+        marginTop: "32px",
         background: "rgba(15, 23, 42, 0.95)",
         border: "1px solid #334155",
-        borderRadius: "28px",
-        padding: "32px",
+        borderRadius: "22px",
+        padding: "clamp(18px, 5vw, 32px)",
       }}
     >
-      <p style={{ color: "#38bdf8", fontWeight: "bold", marginTop: 0 }}>
+      <p
+        style={{
+          color: "#38bdf8",
+          fontWeight: "bold",
+          marginTop: 0,
+          fontSize: "clamp(13px, 3.5vw, 15px)",
+          marginBottom: "6px",
+        }}
+      >
         Briefing
       </p>
 
-      <h2 style={{ fontSize: "34px", marginTop: 0 }}>
+      <h2
+        style={{
+          fontSize: "clamp(22px, 6.5vw, 34px)",
+          marginTop: 0,
+          marginBottom: "10px",
+          lineHeight: 1.15,
+        }}
+      >
         Expansão intelectual de hoje
       </h2>
 
-      <p style={{ color: "#94a3b8", lineHeight: 1.7 }}>
+      <p
+        style={{
+          color: "#94a3b8",
+          lineHeight: 1.6,
+          fontSize: "clamp(14px, 3.8vw, 16px)",
+          margin: 0,
+        }}
+      >
         Em condições normais, recebes o briefing por notificação às 9h. Aqui
         podes também gerar um na hora — vai usar as tuas preferências de tema.
       </p>
@@ -408,23 +501,24 @@ export default function DailyBriefing() {
       <div
         style={{
           display: "flex",
-          gap: "12px",
+          gap: "10px",
           flexWrap: "wrap",
-          marginTop: "12px",
+          marginTop: "14px",
         }}
       >
         <button
           onClick={fetchBriefing}
           disabled={loading}
           style={{
-            padding: "14px 22px",
+            padding: "clamp(12px, 3.5vw, 14px) clamp(18px, 5vw, 22px)",
             borderRadius: "999px",
             border: "none",
             background: loading ? "#475569" : "#38bdf8",
             color: "#020617",
             fontWeight: "bold",
             cursor: loading ? "not-allowed" : "pointer",
-            fontSize: "16px",
+            fontSize: "clamp(14px, 4vw, 16px)",
+            flex: "1 1 auto",
           }}
         >
           {loading ? "A gerar..." : "Gerar briefing agora"}
@@ -433,14 +527,14 @@ export default function DailyBriefing() {
         <button
           onClick={clearBriefing}
           style={{
-            padding: "14px 22px",
+            padding: "clamp(12px, 3.5vw, 14px) clamp(18px, 5vw, 22px)",
             borderRadius: "999px",
             border: "1px solid #64748b",
             background: "transparent",
             color: "#e2e8f0",
             fontWeight: "bold",
             cursor: "pointer",
-            fontSize: "16px",
+            fontSize: "clamp(14px, 4vw, 16px)",
           }}
         >
           Limpar guardado
@@ -448,18 +542,32 @@ export default function DailyBriefing() {
       </div>
 
       {error && (
-        <p style={{ marginTop: "16px", color: "#fbbf24" }}>{error}</p>
+        <p
+          style={{
+            marginTop: "14px",
+            color: "#fbbf24",
+            fontSize: "clamp(13px, 3.6vw, 15px)",
+          }}
+        >
+          {error}
+        </p>
       )}
 
       {briefing && (
         <>
-          <p style={{ marginTop: "16px", color: "#7dd3fc" }}>
+          <p
+            style={{
+              marginTop: "14px",
+              color: "#7dd3fc",
+              fontSize: "clamp(13px, 3.6vw, 15px)",
+            }}
+          >
             Briefing de {briefing.dateKey}
             {!isToday && " — não é o de hoje, gera novo para atualizar."}
             {briefing.source === "ai" ? " · gerado por IA" : " · do pool local"}
           </p>
 
-          <div style={{ display: "grid", gap: "18px", marginTop: "24px" }}>
+          <div style={{ display: "grid", gap: "14px", marginTop: "20px" }}>
             {briefing.items.map((item, index) => (
               <TopicCard
                 key={`${item.title}-${index}`}

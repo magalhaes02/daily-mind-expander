@@ -222,14 +222,16 @@ export default function NotificationButton() {
   return (
     <div
       style={{
-        marginTop: "24px",
-        padding: "24px",
-        borderRadius: "20px",
+        marginTop: "20px",
+        padding: "clamp(18px, 5vw, 24px)",
+        borderRadius: "18px",
         background: "rgba(15, 23, 42, 0.95)",
         border: "1px solid #334155",
       }}
     >
-      <h2 style={{ marginTop: 0 }}>Notificações diárias</h2>
+      <h2 style={{ marginTop: 0, fontSize: "clamp(20px, 5.5vw, 24px)" }}>
+        Notificações diárias
+      </h2>
 
       {iosState === "needs-install" && (
         <div
@@ -237,10 +239,11 @@ export default function NotificationButton() {
             background: "rgba(250, 204, 21, 0.12)",
             border: "1px solid #facc15",
             color: "#fde68a",
-            padding: "14px 16px",
+            padding: "clamp(12px, 3.5vw, 14px) clamp(14px, 4vw, 16px)",
             borderRadius: "12px",
-            marginBottom: "16px",
-            lineHeight: 1.6,
+            marginBottom: "14px",
+            lineHeight: 1.55,
+            fontSize: "clamp(13px, 3.6vw, 15px)",
           }}
         >
           <strong>Importante (iPhone):</strong> as notificações no iOS só
@@ -251,7 +254,14 @@ export default function NotificationButton() {
         </div>
       )}
 
-      <p style={{ color: "#cbd5e1", lineHeight: 1.7 }}>
+      <p
+        style={{
+          color: "#cbd5e1",
+          lineHeight: 1.6,
+          fontSize: "clamp(14px, 3.8vw, 16px)",
+          margin: "0 0 4px 0",
+        }}
+      >
         Ativa as notificações para receberes o briefing diário às 9h, mesmo com
         a app fechada.
       </p>
@@ -259,23 +269,24 @@ export default function NotificationButton() {
       <div
         style={{
           display: "flex",
-          gap: "12px",
+          gap: "10px",
           flexWrap: "wrap",
-          marginTop: "12px",
+          marginTop: "14px",
         }}
       >
         <button
           onClick={subscribePush}
           disabled={busy}
           style={{
-            padding: "14px 22px",
+            padding: "clamp(12px, 3.5vw, 14px) clamp(18px, 5vw, 22px)",
             borderRadius: "999px",
             border: "none",
             background: busy ? "#475569" : "#38bdf8",
             color: "#020617",
             fontWeight: "bold",
             cursor: busy ? "not-allowed" : "pointer",
-            fontSize: "16px",
+            fontSize: "clamp(14px, 4vw, 16px)",
+            flex: "1 1 auto",
           }}
         >
           {busy ? "A processar..." : "Ativar notificações diárias"}
@@ -285,14 +296,14 @@ export default function NotificationButton() {
           onClick={unsubscribePush}
           disabled={busy}
           style={{
-            padding: "14px 22px",
+            padding: "clamp(12px, 3.5vw, 14px) clamp(18px, 5vw, 22px)",
             borderRadius: "999px",
             border: "1px solid #64748b",
             background: "transparent",
             color: "#e2e8f0",
             fontWeight: "bold",
             cursor: busy ? "not-allowed" : "pointer",
-            fontSize: "16px",
+            fontSize: "clamp(14px, 4vw, 16px)",
           }}
         >
           Remover subscrição
