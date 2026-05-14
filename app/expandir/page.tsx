@@ -14,8 +14,8 @@ export default function ExpandirPage() {
         background:
           "radial-gradient(circle at top left, #1e293b, #020617 45%, #000000)",
         color: "white",
-        fontFamily: "Arial, sans-serif",
         padding: "clamp(16px, 4vw, 40px)",
+        paddingBottom: "calc(env(safe-area-inset-bottom) + 96px)",
       }}
     >
       <section style={{ maxWidth: "900px", margin: "0 auto" }}>

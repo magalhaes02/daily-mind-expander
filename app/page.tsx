@@ -11,11 +11,11 @@ export default function Home() {
         background:
           "radial-gradient(circle at top left, #1e293b, #020617 45%, #000000)",
         color: "white",
-        fontFamily: "Arial, sans-serif",
         padding: "clamp(16px, 4vw, 40px)",
+        paddingBottom: "calc(env(safe-area-inset-bottom) + 96px)",
       }}
     >
-      <section style={{ maxWidth: "900px", margin: "0 auto" }}>
+      <section style={{ maxWidth: "720px", margin: "0 auto" }}>
         <header
           style={{
             display: "flex",
@@ -23,6 +23,7 @@ export default function Home() {
             alignItems: "flex-start",
             gap: "16px",
             flexWrap: "wrap",
+            marginBottom: "8px",
           }}
         >
           <div style={{ flex: "1 1 auto", minWidth: 0 }}>
@@ -31,20 +32,30 @@ export default function Home() {
                 display: "inline-block",
                 padding: "5px 12px",
                 borderRadius: "999px",
-                background: "rgba(56, 189, 248, 0.15)",
+                background:
+                  "linear-gradient(90deg, rgba(56, 189, 248, 0.18), rgba(168, 85, 247, 0.18))",
                 color: "#7dd3fc",
-                fontWeight: "bold",
-                fontSize: "clamp(11px, 3vw, 13px)",
-                marginBottom: "10px",
+                fontWeight: 800,
+                fontSize: "clamp(10px, 2.8vw, 12px)",
+                letterSpacing: "0.05em",
+                textTransform: "uppercase",
+                marginBottom: "12px",
+                border: "1px solid rgba(56, 189, 248, 0.3)",
               }}
             >
               Briefing diário às 9h
             </div>
             <h1
               style={{
-                fontSize: "clamp(28px, 8vw, 48px)",
-                lineHeight: 1.05,
+                fontSize: "clamp(30px, 9vw, 48px)",
+                lineHeight: 1.0,
                 margin: 0,
+                fontWeight: 900,
+                background:
+                  "linear-gradient(135deg, #f8fafc 0%, #38bdf8 70%, #a855f7 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
               }}
             >
               Daily Mind Expander
@@ -61,39 +72,40 @@ export default function Home() {
 
         <div
           style={{
-            marginTop: "24px",
+            marginTop: "28px",
             display: "grid",
-            gap: "14px",
-            gridTemplateColumns: "repeat(auto-fit, minmax(min(260px, 100%), 1fr))",
+            gap: "16px",
+            gridTemplateColumns: "repeat(auto-fit, minmax(min(280px, 100%), 1fr))",
           }}
         >
           <HomeTile
             href="/expandir"
             emoji="📚"
             title="Expandir conhecimento"
-            subtitle="Tópicos do dia em variedade — ciência, história, cultura, comportamento humano e mais."
+            subtitle="Tópicos do dia em variedade — ciência, história, cultura e mais."
             accent="#38bdf8"
+            badge="Hoje"
           />
           <HomeTile
             href="/quizz"
             emoji="🧠"
             title="Quizz"
-            subtitle="5 perguntas de escolha múltipla para testar o que sabes."
-            accent="#a855f7"
+            subtitle="5 perguntas para testar o que sabes."
+            accent="#c084fc"
           />
           <HomeTile
             href="/pensar"
             emoji="💭"
             title="Vamos pensar"
-            subtitle="Uma pergunta profunda do dia para te fazer parar e pensar."
-            accent="#facc15"
+            subtitle="Uma pergunta profunda para parar e pensar."
+            accent="#fbbf24"
           />
           <HomeTile
             href="/glossario"
             emoji="🔍"
             title="Glossário"
-            subtitle="Pergunta sobre qualquer coisa. A IA explica em profundidade."
-            accent="#22d3ee"
+            subtitle="Pergunta sobre qualquer coisa. A IA explica."
+            accent="#5eead4"
           />
         </div>
 
@@ -103,9 +115,10 @@ export default function Home() {
             textAlign: "center",
             color: "#475569",
             fontSize: "clamp(11px, 3vw, 13px)",
+            fontWeight: 700,
           }}
         >
-          Construído com curiosidade · grátis · open source
+          Curiosidade · grátis · open source
         </footer>
       </section>
     </main>

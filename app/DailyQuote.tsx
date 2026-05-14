@@ -53,31 +53,53 @@ export default function DailyQuote() {
   return (
     <div
       style={{
-        marginTop: "16px",
-        padding: "clamp(16px, 4.5vw, 20px) clamp(18px, 5vw, 24px)",
-        borderRadius: "18px",
+        position: "relative",
+        marginTop: "20px",
+        padding: "clamp(20px, 5.5vw, 28px) clamp(22px, 6vw, 30px)",
+        borderRadius: "24px",
         background:
-          "linear-gradient(135deg, rgba(56, 189, 248, 0.08), rgba(168, 85, 247, 0.08))",
-        border: "1px solid rgba(56, 189, 248, 0.25)",
+          "linear-gradient(135deg, rgba(56, 189, 248, 0.12), rgba(168, 85, 247, 0.12))",
+        border: "2px solid rgba(56, 189, 248, 0.25)",
+        boxShadow: "0 10px 32px rgba(56, 189, 248, 0.10)",
+        overflow: "hidden",
       }}
     >
-      <p
+      <span
+        aria-hidden
         style={{
-          margin: 0,
-          fontSize: "clamp(15px, 4.2vw, 18px)",
-          fontStyle: "italic",
-          color: "#e0f2fe",
-          lineHeight: 1.5,
+          position: "absolute",
+          top: "-10px",
+          left: "16px",
+          fontSize: "84px",
+          color: "rgba(125, 211, 252, 0.18)",
+          fontWeight: 900,
+          lineHeight: 1,
+          pointerEvents: "none",
         }}
       >
-        &ldquo;{quote.text}&rdquo;
+        &ldquo;
+      </span>
+      <p
+        style={{
+          position: "relative",
+          margin: 0,
+          fontSize: "clamp(16px, 4.5vw, 20px)",
+          color: "#e0f2fe",
+          lineHeight: 1.45,
+          fontWeight: 700,
+        }}
+      >
+        {quote.text}
       </p>
       <p
         style={{
-          margin: "8px 0 0 0",
+          position: "relative",
+          margin: "12px 0 0 0",
           fontSize: "clamp(12px, 3.4vw, 14px)",
           color: "#7dd3fc",
           textAlign: "right",
+          fontWeight: 800,
+          letterSpacing: "0.02em",
         }}
       >
         — {quote.author}
