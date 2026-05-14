@@ -20,23 +20,29 @@ FORMATO OBRIGATÓRIO (responde APENAS com JSON válido, sem markdown, sem \`\`\`
       "category": "string curta — o tema",
       "title": "título fascinante, máx 80 chars",
       "text": "explicação clara e envolvente em 2-3 frases, simples mas inteligente",
-      "relevance": "1-2 frases explicando porque importa, é útil ou impressionante"
+      "relevance": "1 frase CURTA e direta — máximo 15 palavras — porque importa"
     }
   ],
   "reflection": "1 pergunta para reflexão pessoal",
-  "recommendation": "1 recomendação concreta (livro, filme, documentário, canal, artigo ou conceito) com markdown bold no nome"
+  "recommendation": "1 recomendação concreta (livro, filme, documentário, canal, artigo ou conceito) com markdown bold no nome",
+  "quote": {
+    "text": "1 citação inspiradora poderosa, ligada a algum dos tópicos",
+    "author": "Autor da citação"
+  }
 }
 
 REGRAS:
 - Entre 12 e 16 tópicos.
 - Cada tópico curto, direto, fascinante.
+- "relevance" é OBRIGATORIAMENTE 1 frase curta, máximo 15 palavras. Como um lema. Direta ao osso.
 - Mistura temas — nunca dois tópicos do mesmo tema seguidos, e variedade real (leve, profundo, inesperado).
 - Linguagem envolvente, fácil de ler, em português de Portugal.
 - Inclui pelo menos 1 tópico de cada bloco amplo: ciência/tecnologia, comportamento humano/psicologia, dinheiro/poder/mundo, cultura/arte/curiosidades.
 - Inclui pelo menos 1 facto chocante, "sabias que?" ou curiosidade absurda mas real.
 - Não repetir conceitos óbvios todos os dias.
 - A reflection deve ser provocadora, não genérica.
-- A recommendation deve ser concreta e específica.`;
+- A recommendation deve ser concreta e específica.
+- A quote deve ser real (atribuída a pessoa real ou anónima como "Provérbio"), poderosa, e ligada a algum dos tópicos.`;
 
 type GeminiResponse = {
   candidates?: {
@@ -48,6 +54,7 @@ function parseBriefingJSON(text: string): {
   items: BriefingItem[];
   reflection: string;
   recommendation: string;
+  quote?: { text: string; author: string };
 } {
   let cleaned = text.trim();
   if (cleaned.startsWith("```")) {
@@ -65,6 +72,15 @@ function parseBriefingJSON(text: string): {
     throw new Error("Resposta da Gemini não contém items[]");
   }
 
+  let quote: { text: string; author: string } | undefined;
+  if (parsed.quote && typeof parsed.quote === "object") {
+    const qText = String(parsed.quote.text ?? "").trim();
+    const qAuthor = String(parsed.quote.author ?? "").trim();
+    if (qText) {
+      quote = { text: qText, author: qAuthor || "Anónimo" };
+    }
+  }
+
   return {
     items: parsed.items.map((item: BriefingItem) => ({
       category: String(item.category ?? ""),
@@ -74,13 +90,15 @@ function parseBriefingJSON(text: string): {
     })),
     reflection: String(parsed.reflection ?? ""),
     recommendation: String(parsed.recommendation ?? ""),
+    quote,
   };
 }
 
 export async function generateBriefingWithGemini(
   dateKey: string,
   apiKey: string,
-  preferredTopics: string[] = []
+  preferredTopics: string[] = [],
+  fast = false
 ): Promise<Briefing> {
   const lisbonDate = new Date().toLocaleDateString("pt-PT", {
     timeZone: "Europe/Lisbon",
@@ -97,9 +115,13 @@ export async function generateBriefingWithGemini(
         )}`
       : "";
 
+  const fastBlock = fast
+    ? `\n\nMODO RÁPIDO: gera APENAS 5 tópicos (em vez de 12-16). Escolhe os mais impactantes e variados. Textos um pouco mais curtos.`
+    : "";
+
   const userPrompt = `Gera o briefing intelectual para hoje (${lisbonDate}, chave: ${dateKey}).
 
-Mistura temas atuais com conhecimento intemporal. Surpreende. Foge do óbvio. Não repetas o estilo dos exemplos típicos — escolhe ângulos inesperados sobre cada tema.${preferredBlock}`;
+Mistura temas atuais com conhecimento intemporal. Surpreende. Foge do óbvio. Não repetas o estilo dos exemplos típicos — escolhe ângulos inesperados sobre cada tema.${preferredBlock}${fastBlock}`;
 
   const response = await fetch(`${GEMINI_ENDPOINT}?key=${apiKey}`, {
     method: "POST",
@@ -134,5 +156,6 @@ Mistura temas atuais com conhecimento intemporal. Surpreende. Foge do óbvio. N�
     items: parsed.items,
     reflection: parsed.reflection,
     recommendation: parsed.recommendation,
+    quote: parsed.quote,
   };
 }

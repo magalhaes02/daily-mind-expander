@@ -5,6 +5,11 @@ export type BriefingItem = {
   relevance: string;
 };
 
+export type Quote = {
+  text: string;
+  author: string;
+};
+
 export type Briefing = {
   generatedAt: string;
   dateKey: string;
@@ -12,6 +17,7 @@ export type Briefing = {
   items: BriefingItem[];
   reflection: string;
   recommendation: string;
+  quote?: Quote;
 };
 
 export const briefingPool: BriefingItem[] = [
@@ -290,6 +296,29 @@ export const reflectionPool: string[] = [
   "O que farias se soubesses que ninguém iria julgar?",
 ];
 
+export const quotePool: Quote[] = [
+  { text: "O que não te mata, fortalece-te.", author: "Nietzsche" },
+  { text: "Sei que nada sei.", author: "Sócrates" },
+  { text: "A vida não examinada não vale a pena ser vivida.", author: "Sócrates" },
+  { text: "O homem é a medida de todas as coisas.", author: "Protágoras" },
+  { text: "Penso, logo existo.", author: "Descartes" },
+  { text: "A liberdade é a consciência da necessidade.", author: "Espinoza" },
+  { text: "Tudo o que é sólido se desfaz no ar.", author: "Karl Marx" },
+  { text: "Há mais coisas entre o céu e a terra do que sonha a tua vã filosofia.", author: "Shakespeare" },
+  { text: "Não somos o que sabemos, somos o que estamos dispostos a aprender.", author: "Mary Catherine Bateson" },
+  { text: "A imaginação é mais importante que o conhecimento.", author: "Einstein" },
+  { text: "O contrário de uma verdade trivial é uma falsidade. O contrário de uma verdade profunda pode ser outra verdade profunda.", author: "Niels Bohr" },
+  { text: "Os limites da minha linguagem são os limites do meu mundo.", author: "Wittgenstein" },
+  { text: "Não basta ter inteligência, é preciso usá-la bem.", author: "Descartes" },
+  { text: "A pressa é inimiga da perfeição.", author: "Provérbio" },
+  { text: "Quem não arrisca não petisca.", author: "Provérbio" },
+  { text: "Quando a única ferramenta que tens é um martelo, tudo parece um prego.", author: "Maslow" },
+  { text: "O mundo é tudo aquilo que é o caso.", author: "Wittgenstein" },
+  { text: "Sê a mudança que queres ver no mundo.", author: "Gandhi" },
+  { text: "Não é a espécie mais forte que sobrevive, mas a mais adaptável à mudança.", author: "Darwin" },
+  { text: "O ser humano é condenado a ser livre.", author: "Sartre" },
+];
+
 export const recommendationPool: string[] = [
   "Explora o conceito de **modelos mentais** — ferramentas de pensamento usadas para entender dinheiro, poder, risco e sistemas complexos.",
   "Lê *Thinking, Fast and Slow* de Daniel Kahneman — base para entender erros cognitivos.",
@@ -337,6 +366,7 @@ export function buildPoolBriefing(
   const items = pickRandom(candidates, Math.min(12, candidates.length));
   const [reflection] = pickRandom(reflectionPool, 1);
   const [recommendation] = pickRandom(recommendationPool, 1);
+  const [quote] = pickRandom(quotePool, 1);
   return {
     generatedAt: new Date().toISOString(),
     dateKey,
@@ -344,5 +374,6 @@ export function buildPoolBriefing(
     items,
     reflection,
     recommendation,
+    quote,
   };
 }

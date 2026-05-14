@@ -1,10 +1,26 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { Briefing, BriefingItem } from "./lib/briefing-pool";
 import { loadPreferences } from "./TopicSelector";
 
 const STORAGE_KEY = "daily-mind-expander-briefing";
+const FAVORITES_KEY = "daily-mind-expander-favorites";
+
+function loadFavorites(): Set<string> {
+  if (typeof localStorage === "undefined") return new Set();
+  try {
+    const raw = localStorage.getItem(FAVORITES_KEY);
+    if (!raw) return new Set();
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed)) return new Set(parsed.map(String));
+  } catch {}
+  return new Set();
+}
+
+function saveFavorites(favs: Set<string>) {
+  localStorage.setItem(FAVORITES_KEY, JSON.stringify(Array.from(favs)));
+}
 
 function todayKeyLisbon(): string {
   return new Intl.DateTimeFormat("en-CA", {
@@ -118,13 +134,49 @@ async function streamExpand(
 function TopicCard({
   item,
   index,
+  isFavorite,
+  onToggleFavorite,
 }: {
   item: BriefingItem;
   index: number;
+  isFavorite: boolean;
+  onToggleFavorite: () => void;
 }) {
   const [expanded, setExpanded] = useState<string | null>(null);
   const [streaming, setStreaming] = useState(false);
   const [error, setError] = useState("");
+  const [speaking, setSpeaking] = useState(false);
+  const utterRef = useRef<SpeechSynthesisUtterance | null>(null);
+
+  function toggleSpeak() {
+    if (typeof window === "undefined" || !("speechSynthesis" in window)) {
+      return;
+    }
+    if (speaking) {
+      window.speechSynthesis.cancel();
+      setSpeaking(false);
+      return;
+    }
+    const text = `${item.title}. ${item.text}. Porque importa: ${item.relevance}.`;
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = "pt-PT";
+    utter.rate = 1.0;
+    utter.pitch = 1.0;
+    utter.onend = () => setSpeaking(false);
+    utter.onerror = () => setSpeaking(false);
+    utterRef.current = utter;
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utter);
+    setSpeaking(true);
+  }
+
+  useEffect(() => {
+    return () => {
+      if (typeof window !== "undefined" && "speechSynthesis" in window) {
+        window.speechSynthesis.cancel();
+      }
+    };
+  }, []);
 
   async function loadMore() {
     if (streaming) return;
@@ -165,17 +217,60 @@ function TopicCard({
         padding: "clamp(16px, 4.5vw, 22px)",
       }}
     >
-      <p
+      <div
         style={{
-          color: "#38bdf8",
-          fontWeight: "bold",
-          marginTop: 0,
-          fontSize: "clamp(13px, 3.6vw, 15px)",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          gap: "8px",
           marginBottom: "8px",
         }}
       >
-        {index + 1}. {item.category}
-      </p>
+        <p
+          style={{
+            color: "#38bdf8",
+            fontWeight: "bold",
+            margin: 0,
+            fontSize: "clamp(13px, 3.6vw, 15px)",
+          }}
+        >
+          {index + 1}. {item.category}
+        </p>
+        <div style={{ display: "flex", gap: "6px" }}>
+          <button
+            onClick={toggleSpeak}
+            aria-label={speaking ? "Parar leitura" : "Ouvir tópico"}
+            title={speaking ? "Parar" : "Ouvir"}
+            style={{
+              padding: "6px 10px",
+              borderRadius: "999px",
+              border: "1px solid #334155",
+              background: speaking ? "rgba(56, 189, 248, 0.2)" : "transparent",
+              color: speaking ? "#7dd3fc" : "#94a3b8",
+              cursor: "pointer",
+              fontSize: "13px",
+            }}
+          >
+            {speaking ? "⏸️" : "🔊"}
+          </button>
+          <button
+            onClick={onToggleFavorite}
+            aria-label={isFavorite ? "Remover favorito" : "Adicionar favorito"}
+            title={isFavorite ? "Favorito" : "Adicionar favorito"}
+            style={{
+              padding: "6px 10px",
+              borderRadius: "999px",
+              border: "1px solid #334155",
+              background: isFavorite ? "rgba(250, 204, 21, 0.18)" : "transparent",
+              color: isFavorite ? "#facc15" : "#94a3b8",
+              cursor: "pointer",
+              fontSize: "13px",
+            }}
+          >
+            {isFavorite ? "★" : "☆"}
+          </button>
+        </div>
+      </div>
       <h3
         style={{
           marginTop: 0,
@@ -367,6 +462,21 @@ export default function DailyBriefing() {
   const [briefing, setBriefing] = useState<Briefing | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string>("");
+  const [favorites, setFavorites] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    setFavorites(loadFavorites());
+  }, []);
+
+  function toggleFavorite(title: string) {
+    setFavorites((prev) => {
+      const next = new Set(prev);
+      if (next.has(title)) next.delete(title);
+      else next.add(title);
+      saveFavorites(next);
+      return next;
+    });
+  }
 
   useEffect(() => {
     const stored = loadFromStorage();
@@ -420,14 +530,15 @@ export default function DailyBriefing() {
     };
   }, []);
 
-  async function fetchBriefing() {
+  async function fetchBriefing(fast = false) {
     setLoading(true);
     setError("");
     try {
       const preferences = loadPreferences();
-      const url = preferences.length
-        ? `/api/briefing?topics=${encodeURIComponent(preferences.join(","))}`
-        : "/api/briefing";
+      const params = new URLSearchParams();
+      if (preferences.length) params.set("topics", preferences.join(","));
+      if (fast) params.set("fast", "1");
+      const url = `/api/briefing${params.toString() ? "?" + params.toString() : ""}`;
 
       const res = await fetch(url, { cache: "no-store" });
       if (!res.ok) throw new Error(`API ${res.status}`);
@@ -507,7 +618,7 @@ export default function DailyBriefing() {
         }}
       >
         <button
-          onClick={fetchBriefing}
+          onClick={() => fetchBriefing(false)}
           disabled={loading}
           style={{
             padding: "clamp(12px, 3.5vw, 14px) clamp(18px, 5vw, 22px)",
@@ -521,13 +632,31 @@ export default function DailyBriefing() {
             flex: "1 1 auto",
           }}
         >
-          {loading ? "A gerar..." : "Gerar briefing agora"}
+          {loading ? "A gerar..." : "Gerar briefing"}
+        </button>
+
+        <button
+          onClick={() => fetchBriefing(true)}
+          disabled={loading}
+          title="Versão curta com 5 tópicos"
+          style={{
+            padding: "clamp(12px, 3.5vw, 14px) clamp(16px, 4.5vw, 20px)",
+            borderRadius: "999px",
+            border: "1px solid #38bdf8",
+            background: "transparent",
+            color: "#7dd3fc",
+            fontWeight: "bold",
+            cursor: loading ? "not-allowed" : "pointer",
+            fontSize: "clamp(14px, 4vw, 16px)",
+          }}
+        >
+          ⚡ Modo rápido
         </button>
 
         <button
           onClick={clearBriefing}
           style={{
-            padding: "clamp(12px, 3.5vw, 14px) clamp(18px, 5vw, 22px)",
+            padding: "clamp(12px, 3.5vw, 14px) clamp(16px, 4.5vw, 20px)",
             borderRadius: "999px",
             border: "1px solid #64748b",
             background: "transparent",
@@ -537,7 +666,7 @@ export default function DailyBriefing() {
             fontSize: "clamp(14px, 4vw, 16px)",
           }}
         >
-          Limpar guardado
+          Limpar
         </button>
       </div>
 
@@ -573,6 +702,8 @@ export default function DailyBriefing() {
                 key={`${item.title}-${index}`}
                 item={item}
                 index={index}
+                isFavorite={favorites.has(item.title)}
+                onToggleFavorite={() => toggleFavorite(item.title)}
               />
             ))}
           </div>
