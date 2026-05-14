@@ -97,21 +97,36 @@ export default function QuizClient() {
 
   if (error) {
     return (
-      <div>
-        <p style={{ color: "#fca5a5", fontSize: "clamp(14px, 3.8vw, 16px)" }}>
+      <div
+        style={{
+          padding: "clamp(18px, 5vw, 24px)",
+          borderRadius: "16px",
+          background: "rgba(239, 68, 68, 0.08)",
+          border: "1px solid rgba(239, 68, 68, 0.3)",
+        }}
+      >
+        <p
+          style={{
+            color: "#fca5a5",
+            fontSize: "clamp(14px, 3.8vw, 16px)",
+            margin: 0,
+            lineHeight: 1.55,
+          }}
+        >
           {error}
         </p>
         <button
           onClick={loadQuiz}
           style={{
-            marginTop: "12px",
+            marginTop: "14px",
             padding: "12px 20px",
             borderRadius: "999px",
             border: "none",
-            background: "#38bdf8",
-            color: "#020617",
+            background: "#a855f7",
+            color: "#fff",
             fontWeight: "bold",
             cursor: "pointer",
+            fontSize: "clamp(13px, 3.7vw, 15px)",
           }}
         >
           Tentar de novo

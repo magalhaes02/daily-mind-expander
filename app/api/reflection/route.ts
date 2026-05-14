@@ -1,5 +1,7 @@
+import { geminiFetchWithRetry, friendlyGeminiError } from "../../lib/gemini-retry";
+
 export const dynamic = "force-dynamic";
-export const maxDuration = 20;
+export const maxDuration = 60;
 
 const GEMINI_MODEL = "gemini-2.5-flash";
 const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
@@ -38,32 +40,35 @@ export async function GET() {
   }
 
   try {
-    const response = await fetch(`${GEMINI_ENDPOINT}?key=${apiKey}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-        contents: [
-          {
-            role: "user",
-            parts: [
-              {
-                text: "Dá-me 1 pergunta profunda para reflexão pessoal — algo que vou lembrar e continuar a pensar durante o dia.",
-              },
-            ],
+    const response = await geminiFetchWithRetry(
+      `${GEMINI_ENDPOINT}?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+          contents: [
+            {
+              role: "user",
+              parts: [
+                {
+                  text: "Dá-me 1 pergunta profunda para reflexão pessoal — algo que vou lembrar e continuar a pensar durante o dia.",
+                },
+              ],
+            },
+          ],
+          generationConfig: {
+            temperature: 1.1,
+            responseMimeType: "application/json",
           },
-        ],
-        generationConfig: {
-          temperature: 1.1,
-          responseMimeType: "application/json",
-        },
-      }),
-    });
+        }),
+      }
+    );
 
     if (!response.ok) {
       const errorText = await response.text().catch(() => "");
       return Response.json(
-        { error: `Gemini API ${response.status}: ${errorText.slice(0, 200)}` },
+        { error: friendlyGeminiError(response.status, errorText) },
         { status: 502 }
       );
     }

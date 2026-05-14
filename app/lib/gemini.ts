@@ -1,4 +1,5 @@
 import type { Briefing, BriefingItem } from "./briefing-pool";
+import { geminiFetchWithRetry } from "./gemini-retry";
 
 const GEMINI_MODEL = "gemini-2.5-flash";
 const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
@@ -123,18 +124,21 @@ export async function generateBriefingWithGemini(
 
 Mistura temas atuais com conhecimento intemporal. Surpreende. Foge do óbvio. Não repetas o estilo dos exemplos típicos — escolhe ângulos inesperados sobre cada tema.${preferredBlock}${fastBlock}`;
 
-  const response = await fetch(`${GEMINI_ENDPOINT}?key=${apiKey}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-      contents: [{ role: "user", parts: [{ text: userPrompt }] }],
-      generationConfig: {
-        temperature: 1.0,
-        responseMimeType: "application/json",
-      },
-    }),
-  });
+  const response = await geminiFetchWithRetry(
+    `${GEMINI_ENDPOINT}?key=${apiKey}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+        contents: [{ role: "user", parts: [{ text: userPrompt }] }],
+        generationConfig: {
+          temperature: 1.0,
+          responseMimeType: "application/json",
+        },
+      }),
+    }
+  );
 
   if (!response.ok) {
     const errorText = await response.text();

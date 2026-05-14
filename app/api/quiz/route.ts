@@ -1,7 +1,8 @@
 import { parseTopicsParam } from "../../lib/topics";
+import { geminiFetchWithRetry, friendlyGeminiError } from "../../lib/gemini-retry";
 
 export const dynamic = "force-dynamic";
-export const maxDuration = 30;
+export const maxDuration = 60;
 
 const GEMINI_MODEL = "gemini-2.5-flash";
 const GEMINI_ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
@@ -59,23 +60,26 @@ export async function GET(request: Request) {
 Surpreende com escolhas inesperadas. Foge do óbvio.`;
 
   try {
-    const response = await fetch(`${GEMINI_ENDPOINT}?key=${apiKey}`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
-        contents: [{ role: "user", parts: [{ text: userPrompt }] }],
-        generationConfig: {
-          temperature: 1.0,
-          responseMimeType: "application/json",
-        },
-      }),
-    });
+    const response = await geminiFetchWithRetry(
+      `${GEMINI_ENDPOINT}?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: SYSTEM_PROMPT }] },
+          contents: [{ role: "user", parts: [{ text: userPrompt }] }],
+          generationConfig: {
+            temperature: 1.0,
+            responseMimeType: "application/json",
+          },
+        }),
+      }
+    );
 
     if (!response.ok) {
       const errorText = await response.text().catch(() => "");
       return Response.json(
-        { error: `Gemini API ${response.status}: ${errorText.slice(0, 200)}` },
+        { error: friendlyGeminiError(response.status, errorText) },
         { status: 502 }
       );
     }
